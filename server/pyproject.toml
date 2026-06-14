@@ -51,10 +51,14 @@ src = ["app", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "C4", "SIM", "RUF"]
-# S101 (assert) allowed in tests; configured per-file below.
+# B008: FastAPI's `Depends(...)` in defaults is the framework idiom.
+ignore = ["B008"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101"]
+# Tests use asserts and fixture literals that trip the "hardcoded secret" rule.
+"tests/**" = ["S101", "S105", "S106"]
+# config.py names env fields like `postgres_password` (defaults, not secrets).
+"app/config.py" = ["S105"]
 
 # ---------------------------------------------------------------------------
 [tool.mypy]

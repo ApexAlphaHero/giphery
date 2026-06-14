@@ -73,8 +73,8 @@ Trust boundaries: **(B1)** Internet → SWAG (TLS edge); **(B2)** SWAG → API (
 
 Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 
-- ⬜ Container runs as non-root, minimal image, healthcheck present. *(Phase 2)*
-- ⬜ Least-privilege DB role; DB not exposed to host. *(Phase 2)*
+- ✅ Container runs as non-root, minimal slim image, healthcheck present. *(Phase 2 — server/Dockerfile)*
+- 🚧 Least-privilege DB role; DB not exposed to host. *(Phase 2 — DB not host-exposed in compose; dedicated app role TODO in Phase 8)*
 - 🚧 All secrets via env; `.env` git-ignored; `.env.example` complete. *(Phase 1 — `.env.example` + gitignore done)*
 - ⬜ Argon2id password hashing with sane params; password strength enforced. *(Phase 3)*
 - ⬜ JWT access+refresh with rotation, jti, full claim validation; per-device revocation. *(Phase 3)*
@@ -82,9 +82,9 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - ⬜ Strict input validation (Pydantic), explicit field allow-lists (no mass assignment). *(Phase 3+)*
 - ⬜ File uploads: type sniffed (Pillow), size-capped, filename sanitized, content-hashed, stored outside web root, safe headers. *(Phase 5)*
 - ⬜ RBAC + ownership enforced server-side on every mutation. *(Phase 3+)*
-- ⬜ CORS locked to known origins; OpenAPI docs disabled/gated in prod. *(Phase 2/8)*
-- ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8)*
-- 🚧 Structured audit logging without secrets + 24h rolling app log. *(Phase 1 design done; Phase 2 impl)*
+- ✅ CORS locked to known origins (wildcard rejected in prod); OpenAPI docs gated by `ENABLE_DOCS`. *(Phase 2 — app/main.py)*
+- ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8 — sample conf in README)*
+- ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
 - ⬜ Android: no cleartext, encrypted token storage, no token logging, backup of secrets disabled. *(Phase 7)*
 - ⬜ CI runs lint, type-check, tests, dependency vulnerability scan; security-review per phase. *(Phase 1 skeleton; ongoing)*
 
