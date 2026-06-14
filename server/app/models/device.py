@@ -20,6 +20,8 @@ class Device(UUIDPkMixin, Base):
     name: Mapped[str] = mapped_column(String(128), nullable=False)
     # Current refresh-token id (rotates on every refresh).
     refresh_jti: Mapped[uuid.UUID] = mapped_column(nullable=False, unique=True)
+    # Immediately-previous jti — presenting it again means token reuse → revoke.
+    previous_refresh_jti: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     refresh_token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     platform: Mapped[str | None] = mapped_column(String(128), nullable=True)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

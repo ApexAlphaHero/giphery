@@ -6,6 +6,7 @@ module-level async engine pick up the test DSN.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import tempfile
 from collections.abc import AsyncIterator
@@ -22,12 +23,21 @@ os.environ.setdefault("MEDIA_ROOT", str(Path(_TMP) / "media"))
 os.environ.setdefault("ENABLE_DOCS", "true")
 os.environ.setdefault("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
 
+import pytest  # noqa: E402
 import pytest_asyncio  # noqa: E402
+from app.auth.rate_limit import limiter  # noqa: E402
 from app.db import engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Base  # noqa: E402
 from asgi_lifespan import LifespanManager  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter() -> None:
+    # Isolate rate-limit counters between tests.
+    with contextlib.suppress(Exception):
+        limiter._storage.reset()
 
 
 @pytest_asyncio.fixture(autouse=True)
