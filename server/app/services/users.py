@@ -23,12 +23,14 @@ async def create_user(
     password: str,
     role: str = ROLE_USER,
     display_name: str | None = None,
+    enforce_strength: bool = True,
 ) -> User:
     username = username.strip()
     if await get_by_username(session, username) is not None:
         raise ApiError(409, "username_taken", "That username is already taken")
 
-    validate_password_strength(password)
+    if enforce_strength:
+        validate_password_strength(password)
     user = User(
         username=username,
         password_hash=hash_password(password),

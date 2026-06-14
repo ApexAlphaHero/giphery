@@ -78,7 +78,7 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - 🚧 All secrets via env; `.env` git-ignored; `.env.example` complete. *(Phase 1 — `.env.example` + gitignore done)*
 - ✅ Argon2id password hashing (t=3, m=64MiB, p=2); password strength enforced. *(Phase 3 — app/auth/passwords.py)*
 - ✅ JWT access+refresh with rotation, jti, full claim validation (exp/iat/nbf/iss/aud/typ); per-device revocation + reuse detection. *(Phase 3 — app/auth/tokens.py, services/auth_service.py)*
-- 🚧 Rate limiting + backoff on login (✅) and invite-redeem (Phase 4); no user enumeration (✅ uniform login errors + timing). *(Phase 3/4)*
+- ✅ Rate limiting + backoff on login and invite-redeem; no user enumeration (uniform login errors + timing; generic invite errors). *(Phase 3/4 — slowapi on /auth/login, /auth/refresh, /invites/redeem)*
 - 🚧 Strict input validation (Pydantic), explicit field allow-lists (no mass assignment). *(Phase 3 — auth/setup schemas reject role; more per phase)*
 - ⬜ File uploads: type sniffed (Pillow), size-capped, filename sanitized, content-hashed, stored outside web root, safe headers. *(Phase 5)*
 - ⬜ RBAC + ownership enforced server-side on every mutation. *(Phase 3+)*
