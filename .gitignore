@@ -56,6 +56,7 @@ android/.idea/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+.claude/settings.local.json
 *.swp
 *.swo
 
