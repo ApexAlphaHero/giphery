@@ -1,0 +1,67 @@
+# Giphery full stack. The API is reachable only on the internal network;
+# a separate SWAG reverse proxy (joined to giphery_net) terminates TLS and
+# proxies to api:8000. See README for the SWAG site-conf snippet.
+
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - giphery_media:/data/media
+      - giphery_logs:/data/logs
+    networks:
+      - giphery_net
+    # No host port published in production — SWAG proxies internally.
+    # Uncomment for local dev without SWAG:
+    # ports:
+    #   - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/v1/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - giphery_db:/var/lib/postgresql/data
+    networks:
+      - giphery_net
+    # Not published to the host.
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: enable for distributed rate limiting (multi-node).
+  # redis:
+  #   image: redis:7-alpine
+  #   networks: [giphery_net]
+  #   restart: unless-stopped
+
+volumes:
+  giphery_db:
+  giphery_media:
+  giphery_logs:
+
+networks:
+  giphery_net:
+    # Mark external and pre-create it if SWAG lives in another compose project:
+    #   docker network create giphery_net
+    # external: true
+    driver: bridge

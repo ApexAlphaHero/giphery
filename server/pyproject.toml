@@ -1,0 +1,80 @@
+[project]
+name = "giphery-server"
+version = "0.1.0"
+description = "Giphery API — self-hosted GIF library backend"
+requires-python = ">=3.13,<3.14"
+readme = "../README.md"
+
+dependencies = [
+    "fastapi==0.137.*",
+    "uvicorn[standard]==0.35.*",
+    "gunicorn==23.*",
+    "pydantic==2.13.*",
+    "pydantic-settings==2.7.*",
+    "sqlalchemy[asyncio]==2.0.*",
+    "asyncpg==0.30.*",
+    "alembic==1.14.*",
+    "pyjwt==2.10.*",
+    "argon2-cffi==23.*",
+    "cryptography==44.*",
+    "slowapi==0.1.*",
+    "pillow==11.*",
+    "python-multipart==0.0.*",
+    "jinja2==3.1.*",
+    "httpx==0.28.*",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.9.*",
+    "mypy==1.14.*",
+    "pytest==8.3.*",
+    "pytest-asyncio==0.25.*",
+    "coverage[toml]==7.6.*",
+    "pip-audit==2.7.*",
+    "asgi-lifespan==2.*",
+    "aiosqlite==0.20.*",
+]
+
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "C4", "SIM", "RUF"]
+# S101 (assert) allowed in tests; configured per-file below.
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+disallow_untyped_defs = true
+files = ["app"]
+
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra -q"
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 75
