@@ -86,7 +86,7 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - ✅ Admin web console: httpOnly+SameSite cookies, double-submit CSRF on all POSTs, no inline JS/CDN, rate-limited login. *(Phase 6 — webui/security.py, routers/webui.py)*
 - ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8 — sample conf in README)*
 - ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
-- ⬜ Android: no cleartext, encrypted token storage, no token logging, backup of secrets disabled. *(Phase 7)*
+- ✅ Android: HTTPS-only (no cleartext + network security config), refresh token in Keystore-backed EncryptedSharedPreferences (access token in-memory), OkHttp logging redacts Authorization, `allowBackup=false` + backup/data-extraction rules exclude the token store, transparent 401 refresh. *(Phase 7)*
 - ⬜ CI runs lint, type-check, tests, dependency vulnerability scan; security-review per phase. *(Phase 1 skeleton; ongoing)*
 
 ## Responsible disclosure
