@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>giphery-api</Name>
-  <Repository>ghcr.io/apexalphahero/giphery-api:latest</Repository>
+  <Repository>ghcr.io/apexalphahero/giphery-api:stable</Repository>
   <Registry>https://github.com/ApexAlphaHero/giphery/pkgs/container/giphery-api</Registry>
   <Network>giphery</Network>
   <MyIP/>

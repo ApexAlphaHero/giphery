@@ -92,11 +92,24 @@ docker logs giphery-api          # also echoes app/access/audit JSON lines
 - **App won't connect:** it requires real HTTPS. A self-signed cert will be
   rejected by the release build — use a CA-issued cert via SWAG.
 
-## Updating
+## Image channels & updating
 
-Push to `main` → CI republishes `:latest`. In Unraid, the **giphery-api**
-container shows an update; click **Force update** (or use Auto-Update). The new
-container re-runs migrations on start.
+Two tags are published to GHCR:
+
+| Tag | Moves when | Use for |
+|-----|-----------|---------|
+| `:stable` | a release is tagged (`git tag v1.2.3 && git push --tags`) | **production / Unraid auto-update** (the template uses this) |
+| `:latest` | every push to `main` | testing the newest build |
+
+The **giphery-db** template adds a `pg_isready` healthcheck so Unraid shows DB
+readiness. There's no `depends_on` with native templates, but it isn't needed:
+**giphery-api** runs its migration entrypoint with a ~60s retry loop, so it
+self-heals regardless of which container starts first.
+
+To update: when a new `:stable` is published, the **giphery-api** container shows
+an update in Unraid → **Force update** (or enable CA Auto-Update). It re-runs
+migrations on start. To stay on the bleeding edge instead, change the
+Repository to `…/giphery-api:latest`.
 
 ## Backups
 
