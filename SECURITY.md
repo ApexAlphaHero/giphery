@@ -80,8 +80,8 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - ✅ JWT access+refresh with rotation, jti, full claim validation (exp/iat/nbf/iss/aud/typ); per-device revocation + reuse detection. *(Phase 3 — app/auth/tokens.py, services/auth_service.py)*
 - ✅ Rate limiting + backoff on login and invite-redeem; no user enumeration (uniform login errors + timing; generic invite errors). *(Phase 3/4 — slowapi on /auth/login, /auth/refresh, /invites/redeem)*
 - 🚧 Strict input validation (Pydantic), explicit field allow-lists (no mass assignment). *(Phase 3 — auth/setup schemas reject role; more per phase)*
-- ⬜ File uploads: type sniffed (Pillow), size-capped, filename sanitized, content-hashed, stored outside web root, safe headers. *(Phase 5)*
-- ⬜ RBAC + ownership enforced server-side on every mutation. *(Phase 3+)*
+- ✅ File uploads: type sniffed (Pillow magic bytes + decode-verify), size + pixel-capped, filename sanitized, sha256 content-hashed/deduped, sharded storage outside web root, safe `image/gif` + `nosniff` + inline disposition + traversal guard. *(Phase 5 — services/gif_validation.py, storage/filesystem.py, routers/gifs.py)*
+- ✅ RBAC + ownership enforced server-side on every mutation; cross-owner access returns 404 (no existence disclosure). *(Phase 3+/5)*
 - ✅ CORS locked to known origins (wildcard rejected in prod); OpenAPI docs gated by `ENABLE_DOCS`. *(Phase 2 — app/main.py)*
 - ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8 — sample conf in README)*
 - ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
