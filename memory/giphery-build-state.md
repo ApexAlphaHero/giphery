@@ -7,10 +7,10 @@ metadata:
 
 Giphery = self-hosted GIF library: dockerized FastAPI+PostgreSQL server (behind SWAG) + Android management app. IME/keyboard app is OUT of scope. Built in 8 phases per the master prompt in the first user message.
 
-**Phase status (as of 2026-06-14):**
-- Phase 1 (docs & scaffolding) — DONE, committed. CLAUDE.md, ARCHITECTURE.md (data model, REST contract, flows, decision log), SECURITY.md (STRIDE + checklist), .env.example, docker-compose.yml, CI, pre-commit, pinned manifests.
-- Phase 2 (backend core) — DONE, committed. config, async DB, UUIDv7 ids, ORM models, Alembic initial migration (citext/pg_trgm), health endpoint, FastAPI app (error envelope, CORS, docs gating), non-root Dockerfile. Tests green.
-- Phases 3–8 PENDING: auth+setup, invitations, gifs+tags, web UI, Android app, security pass.
+**Phase status: ALL 8 PHASES COMPLETE (as of 2026-06-15), each committed.**
+- P1 docs/scaffolding, P2 backend core, P3 auth+setup (Argon2id, JWT rotation+reuse-detection, rate limit), P4 invitations (Fernet-encrypted codes + HMAC lookup, token-based redeem), P5 gifs+tags (Pillow validation, content-addressed storage, dedupe, raw-serve, search), P6 admin web console (Jinja2, cookie+CSRF, no JS), P7 Android app (30 Kotlin files, Compose M3, encrypted tokens, transparent refresh), P8 security pass (headers, least-priv DB SQL, pip-audit clean).
+- Backend: **38 tests pass, ruff + mypy strict clean.** Android can't compile here (no SDK; wrapper jar must be generated — see android/README.md).
+- All SECURITY.md hardening checklist items ✅. Git: 9 commits on default branch, no remote.
 
 **User-added requirement:** a 24-hour rolling app log for troubleshooting — IMPLEMENTED in [server/app/logging_config.py] (TimedRotatingFileHandler, hourly rotation, 24 backups, JSON lines, secret-redaction filter; access/app/audit streams) + request-id middleware. Verified writing + redaction.
 

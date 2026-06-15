@@ -1,16 +1,17 @@
 # Version catalog for the Giphery Android management app.
 [versions]
-kotlin = "2.4.0"
-agp = "8.5.2"
-ksp = "2.4.0-1.0.29"
-composeBom = "2026.05.00"
-material3 = "1.4.0"
+# Kotlin + KSP must be a published, matching pair (KSP is coupled to the
+# Kotlin compiler). 2.2.21 / 2.2.21-2.0.5 is a verified pair on Maven Central.
+kotlin = "2.2.21"
+agp = "8.13.2"
+ksp = "2.2.21-2.0.5"
+composeBom = "2026.05.01"
 activityCompose = "1.9.3"
 navigationCompose = "2.8.5"
 lifecycle = "2.8.7"
 coreKtx = "1.15.0"
 coroutines = "1.9.0"
-hilt = "2.53"
+hilt = "2.59.2"
 hiltNavigationCompose = "1.2.0"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
@@ -40,7 +41,7 @@ compose-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }

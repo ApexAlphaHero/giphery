@@ -33,8 +33,9 @@ Android management app only.** Do not build the IME/keyboard app here.
   Decision log.
 
 ### Android management app
-- Kotlin **2.4.0**, Jetpack **Compose** (BOM 2026.05.00), **Material 3** 1.4.x
-- AGP **8.5.2+**, `compileSdk`/`targetSdk` **36**, `minSdk` **26**
+- Kotlin **2.2.21** + KSP **2.2.21-2.0.5** (must be a published, matching pair),
+  Jetpack **Compose** (BOM 2026.05.01), **Material 3** (BOM-managed)
+- AGP **8.13.2**, Gradle **8.13**, `compileSdk`/`targetSdk` **36**, `minSdk` **26**
 - Retrofit + OkHttp + kotlinx.serialization; **Coil** for animated GIFs
 - Coroutines + Flow; **Hilt** DI; **DataStore** + Keystore-encrypted token storage
 - MVVM + repository pattern, single-activity, Compose Navigation

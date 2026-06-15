@@ -28,7 +28,7 @@ Material You dynamic color.
 >
 > ```bash
 > cd android
-> gradle wrapper --gradle-version 8.11.1   # or just open the folder in Android Studio
+> gradle wrapper --gradle-version 8.13   # or just open the folder in Android Studio
 > ```
 > Android Studio (Ladybug+) regenerates it automatically on first sync.
 
