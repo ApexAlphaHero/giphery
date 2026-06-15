@@ -3,7 +3,6 @@ name = "giphery-server"
 version = "0.1.0"
 description = "Giphery API — self-hosted GIF library backend"
 requires-python = ">=3.13,<3.14"
-readme = "../README.md"
 
 dependencies = [
     "fastapi==0.137.*",
