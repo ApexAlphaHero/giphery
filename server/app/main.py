@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -17,7 +19,7 @@ from app.auth.rate_limit import limiter
 from app.config import get_settings
 from app.logging_config import app_logger, configure_logging
 from app.middleware import access_log_middleware
-from app.routers import auth, gifs, health, invites, setup, tags
+from app.routers import auth, gifs, health, invites, setup, tags, webui
 from app.schemas.errors import ApiError, ErrorBody, ErrorResponse
 
 settings = get_settings()
@@ -104,6 +106,11 @@ def create_app() -> FastAPI:
     app.include_router(invites.router, prefix=API_V1)
     app.include_router(gifs.router, prefix=API_V1)
     app.include_router(tags.router, prefix=API_V1)
+
+    # --- Admin web console (server-rendered) ---
+    static_dir = Path(__file__).resolve().parent / "webui" / "static"
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+    app.include_router(webui.router)
 
     return app
 

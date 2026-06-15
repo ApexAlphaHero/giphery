@@ -264,7 +264,7 @@ sequenceDiagram
 
 | # | Decision | Rationale | Alternatives considered |
 |---|----------|-----------|-------------------------|
-| 1 | **Jinja2 + HTMX** for the admin web UI, not a React SPA | Minimal attack surface, no separate build/CDN, server-rendered auth, fewer deps to vuln-scan | React 19 + Vite SPA (more client complexity, larger surface) |
+| 1 | **Jinja2 server-rendered** admin UI (no external JS/HTMX), not a React SPA | Minimal attack surface: no CDN, no inline scripts (strict CSP holds), forms work without JS, cookie-based auth with httpOnly tokens + double-submit CSRF, fewer deps to vuln-scan | React 19 + Vite SPA (larger surface); HTMX via CDN (CSP/script-src friction) |
 | 2 | **Encrypt invite codes at rest** (Fernet) + HMAC lookup hash | Requirement: admin must view codes later; encryption lets the UI decrypt-and-display while DB holds no plaintext; HMAC enables O(1) redeem lookup | Store-hash-only + show-once (loses view-later); config flag offers this mode |
 | 3 | **HS256** JWT default | Single-service deployment; simple strong shared secret; RRS256/EdDSA available via config | Always asymmetric (unneeded ops overhead for one node) |
 | 4 | **UUIDv7** PKs | Time-ordered → good index locality, non-enumerable, native in PG18 | bigserial (enumerable), UUIDv4 (index fragmentation) |

@@ -83,6 +83,7 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - ✅ File uploads: type sniffed (Pillow magic bytes + decode-verify), size + pixel-capped, filename sanitized, sha256 content-hashed/deduped, sharded storage outside web root, safe `image/gif` + `nosniff` + inline disposition + traversal guard. *(Phase 5 — services/gif_validation.py, storage/filesystem.py, routers/gifs.py)*
 - ✅ RBAC + ownership enforced server-side on every mutation; cross-owner access returns 404 (no existence disclosure). *(Phase 3+/5)*
 - ✅ CORS locked to known origins (wildcard rejected in prod); OpenAPI docs gated by `ENABLE_DOCS`. *(Phase 2 — app/main.py)*
+- ✅ Admin web console: httpOnly+SameSite cookies, double-submit CSRF on all POSTs, no inline JS/CDN, rate-limited login. *(Phase 6 — webui/security.py, routers/webui.py)*
 - ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8 — sample conf in README)*
 - ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
 - ⬜ Android: no cleartext, encrypted token storage, no token logging, backup of secrets disabled. *(Phase 7)*

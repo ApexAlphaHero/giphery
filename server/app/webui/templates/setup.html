@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Giphery — First-run setup{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Welcome to Giphery</h1>
+  <p>Create the first administrator account to get started.</p>
+  <form method="post" action="/setup">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Username
+      <input name="username" autocomplete="username" required minlength="3" maxlength="64"
+             pattern="[A-Za-z0-9_.\-]+">
+    </label>
+    <label>Password
+      <input name="password" type="password" autocomplete="new-password" required minlength="10">
+    </label>
+    <p class="hint">At least 10 characters, with a letter and a digit.</p>
+    <button type="submit" class="primary">Create admin</button>
+  </form>
+</section>
+{% endblock %}

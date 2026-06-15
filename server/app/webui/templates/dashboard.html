@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Giphery — Invitations{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Create invitation</h1>
+  <form method="post" action="/invites" class="row-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Intended user / label
+      <input name="label" maxlength="128" placeholder="e.g. Alice's phone">
+    </label>
+    <label>Max uses
+      <input name="max_uses" type="number" value="1" min="1" max="1000">
+    </label>
+    <label>Expires (optional)
+      <input name="expires_at" type="datetime-local">
+    </label>
+    <button type="submit" class="primary">Create</button>
+  </form>
+  {% if new_code %}
+  <div class="alert notice">
+    New code (copy it now — shown once): <code class="code">{{ new_code }}</code>
+  </div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h1>Invitations</h1>
+  {% if invites %}
+  <table class="grid">
+    <thead>
+      <tr><th>Code</th><th>Label</th><th>Status</th><th>Uses</th>
+          <th>Redeemed by</th><th>Expires</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for inv in invites %}
+      <tr>
+        <td><code class="code">{{ inv.code }}</code></td>
+        <td>{{ inv.label or "—" }}</td>
+        <td><span class="badge {{ inv.status }}">{{ inv.status }}</span></td>
+        <td>{{ inv.uses_count }}/{{ inv.max_uses }}</td>
+        <td>{{ inv.redeemed_by or "—" }}</td>
+        <td>{{ inv.expires_at.strftime("%Y-%m-%d %H:%M") if inv.expires_at else "—" }}</td>
+        <td>{{ inv.created_at.strftime("%Y-%m-%d") }}</td>
+        <td>
+          {% if inv.status == "active" %}
+          <form method="post" action="/invites/{{ inv.id }}/revoke" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="danger">Revoke</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="hint">No invitations yet. Create one above.</p>
+  {% endif %}
+</section>
+{% endblock %}
