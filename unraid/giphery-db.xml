@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>giphery-db</Name>
+  <Repository>postgres:18</Repository>
+  <Registry>https://hub.docker.com/_/postgres</Registry>
+  <Network>giphery</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support/>
+  <Project/>
+  <Overview>PostgreSQL 18 for Giphery. Internal only — do NOT add a port mapping. Must be on the same custom docker network ("giphery") as giphery-api.</Overview>
+  <Category>Tools: Other:</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon>https://www.postgresql.org/media/img/about/press/elephant.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Description>PostgreSQL database backing the Giphery API.</Description>
+  <Networking>
+    <Mode>giphery</Mode>
+  </Networking>
+  <Data>
+    <Volume>
+      <HostDir>/mnt/user/appdata/giphery/db</HostDir>
+      <ContainerDir>/var/lib/postgresql/data</ContainerDir>
+      <Mode>rw</Mode>
+    </Volume>
+  </Data>
+  <Environment>
+    <Variable>
+      <Value>giphery</Value>
+      <Name>POSTGRES_USER</Name>
+      <Mode/>
+    </Variable>
+    <Variable>
+      <Value/>
+      <Name>POSTGRES_PASSWORD</Name>
+      <Mode/>
+    </Variable>
+    <Variable>
+      <Value>giphery</Value>
+      <Name>POSTGRES_DB</Name>
+      <Mode/>
+    </Variable>
+  </Environment>
+  <Config Name="Postgres data" Target="/var/lib/postgresql/data" Default="/mnt/user/appdata/giphery/db" Mode="rw" Description="Database files on the array." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/giphery/db</Config>
+  <Config Name="POSTGRES_USER" Target="POSTGRES_USER" Default="giphery" Mode="" Description="Database user." Type="Variable" Display="always" Required="true" Mask="false">giphery</Config>
+  <Config Name="POSTGRES_PASSWORD" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="Database password — set a strong value, must match DATABASE_URL in giphery-api." Type="Variable" Display="always" Required="true" Mask="true"></Config>
+  <Config Name="POSTGRES_DB" Target="POSTGRES_DB" Default="giphery" Mode="" Description="Database name." Type="Variable" Display="always" Required="true" Mask="false">giphery</Config>
+</Container>
