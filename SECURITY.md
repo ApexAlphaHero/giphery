@@ -74,20 +74,20 @@ Trust boundaries: **(B1)** Internet → SWAG (TLS edge); **(B2)** SWAG → API (
 Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 
 - ✅ Container runs as non-root, minimal slim image, healthcheck present. *(Phase 2 — server/Dockerfile)*
-- 🚧 Least-privilege DB role; DB not exposed to host. *(Phase 2 — DB not host-exposed in compose; dedicated app role TODO in Phase 8)*
+- ✅ Least-privilege DB role; DB not exposed to host. *(Phase 2 compose keeps DB internal; Phase 8 `server/deploy/init-db.sql` provisions a CRUD-only `giphery_app` role)*
 - 🚧 All secrets via env; `.env` git-ignored; `.env.example` complete. *(Phase 1 — `.env.example` + gitignore done)*
 - ✅ Argon2id password hashing (t=3, m=64MiB, p=2); password strength enforced. *(Phase 3 — app/auth/passwords.py)*
 - ✅ JWT access+refresh with rotation, jti, full claim validation (exp/iat/nbf/iss/aud/typ); per-device revocation + reuse detection. *(Phase 3 — app/auth/tokens.py, services/auth_service.py)*
 - ✅ Rate limiting + backoff on login and invite-redeem; no user enumeration (uniform login errors + timing; generic invite errors). *(Phase 3/4 — slowapi on /auth/login, /auth/refresh, /invites/redeem)*
-- 🚧 Strict input validation (Pydantic), explicit field allow-lists (no mass assignment). *(Phase 3 — auth/setup schemas reject role; more per phase)*
+- ✅ Strict input validation (Pydantic v2), explicit field allow-lists — `role`/`owner_id` never client-settable; GifUpdate/SetupRequest/InviteRedeem are closed schemas. *(Phases 3–6)*
 - ✅ File uploads: type sniffed (Pillow magic bytes + decode-verify), size + pixel-capped, filename sanitized, sha256 content-hashed/deduped, sharded storage outside web root, safe `image/gif` + `nosniff` + inline disposition + traversal guard. *(Phase 5 — services/gif_validation.py, storage/filesystem.py, routers/gifs.py)*
 - ✅ RBAC + ownership enforced server-side on every mutation; cross-owner access returns 404 (no existence disclosure). *(Phase 3+/5)*
 - ✅ CORS locked to known origins (wildcard rejected in prod); OpenAPI docs gated by `ENABLE_DOCS`. *(Phase 2 — app/main.py)*
 - ✅ Admin web console: httpOnly+SameSite cookies, double-submit CSRF on all POSTs, no inline JS/CDN, rate-limited login. *(Phase 6 — webui/security.py, routers/webui.py)*
-- ⬜ Security headers set at SWAG; HTTPS enforced; HSTS. *(Phase 8 — sample conf in README)*
+- ✅ Security headers at SWAG (sample conf in README) + app-level defense-in-depth (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, COOP, Permissions-Policy); HTTPS + HSTS at SWAG. *(Phase 8 — app/middleware.py, README)*
 - ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
 - ✅ Android: HTTPS-only (no cleartext + network security config), refresh token in Keystore-backed EncryptedSharedPreferences (access token in-memory), OkHttp logging redacts Authorization, `allowBackup=false` + backup/data-extraction rules exclude the token store, transparent 401 refresh. *(Phase 7)*
-- ⬜ CI runs lint, type-check, tests, dependency vulnerability scan; security-review per phase. *(Phase 1 skeleton; ongoing)*
+- ✅ CI runs lint (ruff incl. flake8-bandit `S` rules), type-check (mypy strict), tests, dependency vulnerability scan (`pip-audit` — clean; `gradle`/`npm` jobs); static analysis run each phase. *(Phase 1 skeleton → Phase 8)*
 
 ## Responsible disclosure
 Report vulnerabilities privately to the repository owner (see README contact). Do not open public issues for security bugs. Expected acknowledgement within a reasonable window; fixes prioritized by severity.

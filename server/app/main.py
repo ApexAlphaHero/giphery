@@ -18,7 +18,7 @@ from app import __version__
 from app.auth.rate_limit import limiter
 from app.config import get_settings
 from app.logging_config import app_logger, configure_logging
-from app.middleware import access_log_middleware
+from app.middleware import access_log_middleware, security_headers_middleware
 from app.routers import auth, gifs, health, invites, setup, tags, webui
 from app.schemas.errors import ApiError, ErrorBody, ErrorResponse
 
@@ -73,8 +73,9 @@ def create_app() -> FastAPI:
             allow_headers=["*"],
         )
 
-    # Access logging / request-id (24h rolling stream).
+    # Access logging / request-id (24h rolling stream) + security headers.
     app.middleware("http")(access_log_middleware)
+    app.middleware("http")(security_headers_middleware)
 
     # --- Error handlers: uniform envelope, no internal leakage ---
     @app.exception_handler(ApiError)

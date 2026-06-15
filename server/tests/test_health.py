@@ -24,3 +24,12 @@ async def test_unknown_route_uses_error_envelope(client: AsyncClient) -> None:
     assert resp.status_code == 404
     body = resp.json()
     assert set(body["error"].keys()) == {"code", "message", "details"}
+
+
+@pytest.mark.asyncio
+async def test_security_headers_present(client: AsyncClient) -> None:
+    resp = await client.get("/api/v1/health")
+    assert resp.headers["X-Content-Type-Options"] == "nosniff"
+    assert resp.headers["X-Frame-Options"] == "DENY"
+    assert "default-src 'self'" in resp.headers["Content-Security-Policy"]
+    assert resp.headers["Referrer-Policy"] == "no-referrer"

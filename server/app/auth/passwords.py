@@ -17,6 +17,12 @@ _hasher = PasswordHasher(
 MIN_PASSWORD_LENGTH = 10
 MAX_PASSWORD_LENGTH = 128  # bound work; Argon2 has no practical max but cap input
 
+# A real Argon2id hash used for the no-such-user branch of login so verification
+# always does equivalent work (mitigates user-enumeration via response timing).
+DUMMY_HASH = PasswordHasher(time_cost=3, memory_cost=64 * 1024, parallelism=2).hash(
+    "giphery-timing-uniformity-placeholder"
+)
+
 
 def hash_password(password: str) -> str:
     return _hasher.hash(password)

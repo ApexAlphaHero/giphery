@@ -9,7 +9,7 @@ import jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.passwords import needs_rehash, verify_password
+from app.auth.passwords import DUMMY_HASH, needs_rehash, verify_password
 from app.auth.tokens import (
     create_access_token,
     create_refresh_token,
@@ -66,13 +66,7 @@ async def login(
 
     # Always run a hash verification to keep timing uniform whether or not the
     # user exists (mitigates user enumeration via response timing).
-    candidate_hash = (
-        user.password_hash
-        if user is not None
-        # A precomputed dummy Argon2id hash for the no-user branch.
-        else "$argon2id$v=19$m=65536,t=3,p=2$c2FsdHNhbHRzYWx0$"
-        "RdescE4i2u4z9rJpJ8u3o3Q1m3aQb8wq6dV0jWlO0aE"
-    )
+    candidate_hash = user.password_hash if user is not None else DUMMY_HASH
     password_ok = verify_password(password, candidate_hash)
 
     if user is None or not user.is_active or not password_ok:

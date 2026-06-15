@@ -13,6 +13,31 @@ from app.logging_config import access_logger
 
 RequestIdHeader = "X-Request-ID"
 
+# Defense-in-depth response headers (SWAG also sets these at the edge). The CSP
+# is strict: no inline scripts/styles — the web console uses an external CSS file.
+_SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    "Content-Security-Policy": (
+        "default-src 'self'; img-src 'self' data:; style-src 'self'; "
+        "script-src 'self'; object-src 'none'; frame-ancestors 'none'; "
+        "base-uri 'self'; form-action 'self'"
+    ),
+}
+
+
+async def security_headers_middleware(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+) -> Response:
+    response = await call_next(request)
+    for key, value in _SECURITY_HEADERS.items():
+        response.headers.setdefault(key, value)
+    return response
+
 
 def _client_ip(request: Request) -> str:
     # Trust X-Forwarded-For's first hop (set by SWAG); fall back to peer.
