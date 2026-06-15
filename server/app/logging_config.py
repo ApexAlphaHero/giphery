@@ -46,7 +46,7 @@ def _redact(value: Any) -> Any:
             k: (_REDACTED if _SECRET_KEY_PATTERN.search(str(k)) else _redact(v))
             for k, v in value.items()
         }
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [_redact(v) for v in value]
     return value
 

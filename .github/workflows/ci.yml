@@ -54,6 +54,12 @@ jobs:
         run: ./gradlew testDebugUnitTest
       - name: Assemble debug APK
         run: ./gradlew assembleDebug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: giphery-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
       # Style checks are advisory for now (not yet formatted to ktlint/detekt
       # rules). Flip continue-on-error to false once the code is auto-formatted.
       - name: Lint (ktlint + detekt)
