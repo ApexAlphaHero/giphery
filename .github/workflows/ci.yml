@@ -35,6 +35,8 @@ jobs:
   android:
     name: Android (build · test · lint)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write       # attach the APK to the release on tag builds
     defaults:
       run:
         working-directory: android
@@ -54,12 +56,22 @@ jobs:
         run: ./gradlew testDebugUnitTest
       - name: Assemble debug APK
         run: ./gradlew assembleDebug
-      - name: Upload debug APK
+      - name: Upload debug APK (CI artifact)
         uses: actions/upload-artifact@v4
         with:
           name: giphery-debug-apk
           path: android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+      # On a vX.Y.Z tag, attach a versioned APK to the GitHub release.
+      - name: Stage versioned APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: cp app/build/outputs/apk/debug/app-debug.apk "app/build/outputs/apk/debug/giphery-${{ github.ref_name }}-debug.apk"
+      - name: Attach APK to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/debug/giphery-${{ github.ref_name }}-debug.apk
+          generate_release_notes: true
       # Style checks are advisory for now (not yet formatted to ktlint/detekt
       # rules). Flip continue-on-error to false once the code is auto-formatted.
       - name: Lint (ktlint + detekt)
