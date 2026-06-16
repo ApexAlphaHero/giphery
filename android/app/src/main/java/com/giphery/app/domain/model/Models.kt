@@ -22,3 +22,13 @@ data class Tag(
     val name: String,
     val usageCount: Int,
 )
+
+data class ServerMeta(
+    val serverVersion: String,
+    val role: String,
+    val gifs: Int,
+    val storageBytes: Long,
+    val tags: Int,
+    val users: Int?,
+    val devices: Int?,
+)

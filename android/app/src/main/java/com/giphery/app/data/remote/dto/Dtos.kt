@@ -74,6 +74,17 @@ data class TagDto(
 )
 
 @Serializable
+data class MetaDto(
+    @SerialName("server_version") val serverVersion: String,
+    val role: String,
+    val gifs: Int,
+    @SerialName("storage_bytes") val storageBytes: Long,
+    val tags: Int,
+    val users: Int? = null,
+    val devices: Int? = null,
+)
+
+@Serializable
 data class ApiErrorBody(
     val error: ApiErrorDetail,
 )

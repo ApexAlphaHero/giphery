@@ -35,6 +35,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val theme by viewModel.themeMode.collectAsState()
+    val meta by viewModel.meta.collectAsState()
 
     Scaffold(
         topBar = {
@@ -75,6 +76,29 @@ fun SettingsScreen(
                 }
             }
 
+            Text("About & stats", style = MaterialTheme.typography.titleMedium)
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    StatRow("App version", viewModel.appVersion)
+                    when {
+                        meta.loading -> StatRow("Server", "loading…")
+                        meta.error != null -> StatRow("Server", meta.error ?: "unavailable")
+                        meta.meta != null -> {
+                            val m = meta.meta!!
+                            StatRow("Server version", m.serverVersion)
+                            StatRow(if (m.role == "admin") "GIFs (all users)" else "GIFs", m.gifs.toString())
+                            StatRow("Storage used", formatBytes(m.storageBytes))
+                            StatRow("Tags", m.tags.toString())
+                            m.users?.let { StatRow("Users", it.toString()) }
+                            m.devices?.let { StatRow("Paired devices", it.toString()) }
+                        }
+                    }
+                }
+            }
+
             OutlinedButton(onClick = viewModel::logout, modifier = Modifier.fillMaxWidth()) {
                 Text("Log out")
             }
@@ -83,6 +107,34 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun StatRow(label: String, value: String) {
+    androidx.compose.foundation.layout.Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(value, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+private fun formatBytes(bytes: Long): String {
+    if (bytes < 1024) return "$bytes B"
+    val units = listOf("KB", "MB", "GB", "TB")
+    var value = bytes.toDouble() / 1024
+    var i = 0
+    while (value >= 1024 && i < units.size - 1) {
+        value /= 1024
+        i++
+    }
+    return String.format(java.util.Locale.US, "%.1f %s", value, units[i])
 }
 
 @Composable

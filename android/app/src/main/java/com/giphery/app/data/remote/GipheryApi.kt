@@ -53,6 +53,9 @@ interface GipheryApi {
     @GET("api/v1/tags")
     suspend fun listTags(@Query("q") q: String? = null): List<TagDto>
 
+    @GET("api/v1/meta")
+    suspend fun meta(): com.giphery.app.data.remote.dto.MetaDto
+
     @POST("api/v1/auth/logout")
     suspend fun logout()
 }

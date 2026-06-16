@@ -6,6 +6,7 @@ import com.giphery.app.data.remote.dto.GifUpdateRequest
 import com.giphery.app.data.remote.toApiException
 import com.giphery.app.domain.model.Gif
 import com.giphery.app.domain.model.GifPage
+import com.giphery.app.domain.model.ServerMeta
 import com.giphery.app.domain.model.Tag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -54,6 +55,19 @@ class GifRepository @Inject constructor(
 
     suspend fun tags(q: String?): Result<List<Tag>> =
         call { api.listTags(q?.ifBlank { null }).map { Tag(it.name, it.usageCount) } }
+
+    suspend fun meta(): Result<ServerMeta> = call {
+        val m = api.meta()
+        ServerMeta(
+            serverVersion = m.serverVersion,
+            role = m.role,
+            gifs = m.gifs,
+            storageBytes = m.storageBytes,
+            tags = m.tags,
+            users = m.users,
+            devices = m.devices,
+        )
+    }
 
     private suspend fun <T> call(block: suspend () -> T): Result<T> =
         withContext(Dispatchers.IO) {

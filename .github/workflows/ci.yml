@@ -51,11 +51,21 @@ jobs:
       - name: Install required SDK packages
         run: sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - uses: gradle/actions/setup-gradle@v4
+      # Version: monotonic code from the run number; name from the tag (vX.Y.Z
+      # -> X.Y.Z) or a dev placeholder on branch builds.
+      - name: Compute version
+        run: |
+          echo "VCODE=${{ github.run_number }}" >> "$GITHUB_ENV"
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "VNAME=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "VNAME=0.0.0-dev" >> "$GITHUB_ENV"
+          fi
       # Hard gates: the app must compile, tests must pass, an APK must assemble.
       - name: Unit tests
         run: ./gradlew testDebugUnitTest
       - name: Assemble debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug -PversionCode=$VCODE -PversionName=$VNAME
       - name: Upload debug APK (CI artifact)
         uses: actions/upload-artifact@v4
         with:
