@@ -34,8 +34,20 @@ class PairingViewModel @Inject constructor(
     val state: StateFlow<PairingUiState> = _state.asStateFlow()
 
     fun onBaseUrl(value: String) = _state.update { it.copy(baseUrl = value, error = null) }
-    fun onCode(value: String) = _state.update { it.copy(code = value, error = null) }
+
+    fun onCode(value: String) =
+        _state.update { it.copy(code = formatInviteCode(value), error = null) }
+
     fun onUsername(value: String) = _state.update { it.copy(username = value, error = null) }
+
+    /** Normalize to upper-case alphanumerics and group as XXXXX-XXXXX-… so the
+     *  user never has to type the hyphens (5 groups of 5 = the issued format). */
+    private fun formatInviteCode(input: String): String =
+        input.uppercase()
+            .filter { it.isLetterOrDigit() }
+            .take(25)
+            .chunked(5)
+            .joinToString("-")
 
     fun submit() {
         val s = _state.value

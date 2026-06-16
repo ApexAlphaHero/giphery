@@ -47,6 +47,17 @@ class PairingViewModelTest {
     }
 
     @Test
+    fun `code is auto-hyphenated uppercased and capped`() {
+        val vm = PairingViewModel(authRepository)
+        vm.onCode("abcde fghij12345")
+        assertEquals("ABCDE-FGHIJ-12345", vm.state.value.code)
+
+        // Pasting the already-hyphenated form is idempotent.
+        vm.onCode("ABCDE-FGHIJ-12345")
+        assertEquals("ABCDE-FGHIJ-12345", vm.state.value.code)
+    }
+
+    @Test
     fun `successful pair sets paired true`() = runTest(dispatcher) {
         coEvery { authRepository.pair(any(), any(), any()) } returns Result.success(Unit)
         val vm = PairingViewModel(authRepository)

@@ -42,6 +42,7 @@ button.link { background: none; border: none; color: var(--accent); padding: 0; 
 .alert.error { background: rgba(255,92,108,.12); border: 1px solid var(--danger); }
 .alert.notice { background: rgba(56,193,114,.12); border: 1px solid var(--ok); }
 .code { background: #0f1218; padding: 2px 8px; border-radius: 6px; letter-spacing: 1px; }
+.code .digit { color: var(--warn); font-weight: 700; }
 table.grid { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .grid th, .grid td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--border); }
 .grid th { color: var(--muted); font-weight: 600; }

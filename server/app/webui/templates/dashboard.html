@@ -34,7 +34,11 @@
     <tbody>
       {% for inv in invites %}
       <tr>
-        <td><code class="code">{{ inv.code }}</code></td>
+        <td><code class="code">
+          {%- for ch in inv.code -%}
+            {%- if ch.isdigit() %}<span class="digit">{{ ch }}</span>{% else %}{{ ch }}{% endif -%}
+          {%- endfor -%}
+        </code></td>
         <td>{{ inv.label or "—" }}</td>
         <td><span class="badge {{ inv.status }}">{{ inv.status }}</span></td>
         <td>{{ inv.uses_count }}/{{ inv.max_uses }}</td>
