@@ -59,18 +59,21 @@ async def test_create_and_revoke_invite_via_web(client: AsyncClient) -> None:
     dash = await client.get("/")
     token = _csrf(dash.text)
 
+    # Create uses Post/Redirect/Get → 303 to "/" (refresh-safe, no duplicates).
     created = await client.post(
         "/invites",
         data={"label": "Alice", "max_uses": "1", "expires_at": "", "csrf_token": token},
     )
-    assert created.status_code == 200
-    assert "shown once" in created.text
-    # The new code is displayed and the row appears with active status.
-    assert "Alice" in created.text
-    assert "active" in created.text
+    assert created.status_code == 303
+    assert created.headers["location"] == "/"
+
+    # The new invite (with its code) shows in the list on the follow-up GET.
+    listing = await client.get("/")
+    assert "Alice" in listing.text
+    assert "active" in listing.text
 
     # Grab the invite id from a revoke form and revoke it.
-    m = re.search(r"/invites/([0-9a-f-]+)/revoke", created.text)
+    m = re.search(r"/invites/([0-9a-f-]+)/revoke", listing.text)
     assert m
     revoke = await client.post(f"/invites/{m.group(1)}/revoke", data={"csrf_token": token})
     assert revoke.status_code == 303

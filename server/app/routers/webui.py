@@ -217,14 +217,16 @@ async def create_invite(
         return _redirect("/login")
     if not security.validate_csrf(request, csrf_token):
         return await _dashboard(request, response, session, admin, error="Invalid session.")
-    _invite, code = await invite_service.create_invite(
+    await invite_service.create_invite(
         session,
         admin=admin,
         label=label.strip() or None,
         max_uses=max(1, min(max_uses, 1000)),
         expires_at=_parse_expires(expires_at),
     )
-    return await _dashboard(request, response, session, admin, new_code=code)
+    # Post/Redirect/Get: a page refresh must not re-submit and create a duplicate.
+    # The new invite (with its code) appears at the top of the list on the GET.
+    return _redirect("/")
 
 
 @router.post("/invites/{invite_id}/revoke", response_class=HTMLResponse)
