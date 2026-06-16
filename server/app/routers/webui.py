@@ -19,7 +19,7 @@ from app.config import get_settings
 from app.db import get_session
 from app.models.user import ROLE_ADMIN, User
 from app.schemas.errors import ApiError
-from app.services import auth_service
+from app.services import auth_service, users_admin
 from app.services import invites as invite_service
 from app.services.users import create_user
 from app.webui import security
@@ -109,12 +109,14 @@ async def _dashboard(
         }
         for inv in invites
     ]
+    users = await users_admin.list_users(session)
     return await _render(
         request,
         response,
         "dashboard.html",
         admin=admin,
         invites=view,
+        users=users,
         new_code=new_code,
         error=error,
     )
@@ -243,4 +245,69 @@ async def revoke_invite(
     if security.validate_csrf(request, csrf_token):
         with contextlib.suppress(ApiError):
             await invite_service.revoke_invite(session, invite_id, admin=admin)
+    return _redirect("/")
+
+
+# --- Users ---------------------------------------------------------------
+@router.post("/users/{user_id}/repair", response_class=HTMLResponse)
+async def repair_user(
+    user_id: uuid.UUID,
+    request: Request,
+    response: Response,
+    csrf_token: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    """Issue a re-pair invite bound to an existing user (account recovery)."""
+    admin = await security.current_admin(request, response, session)
+    if admin is None:
+        return _redirect("/login")
+    if security.validate_csrf(request, csrf_token):
+        target = await session.get(User, user_id)
+        if target is not None:
+            await invite_service.create_invite(
+                session,
+                admin=admin,
+                label=f"re-pair: {target.username}",
+                max_uses=1,
+                expires_at=None,
+                target_user_id=target.id,
+            )
+    # The new re-pair invite (with its code) appears in the invitations list.
+    return _redirect("/")
+
+
+@router.post("/users/{user_id}/revoke-devices", response_class=HTMLResponse)
+async def revoke_user_devices(
+    user_id: uuid.UUID,
+    request: Request,
+    response: Response,
+    csrf_token: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    admin = await security.current_admin(request, response, session)
+    if admin is None:
+        return _redirect("/login")
+    if security.validate_csrf(request, csrf_token):
+        with contextlib.suppress(ApiError):
+            await users_admin.revoke_devices(session, user_id, admin=admin)
+    return _redirect("/")
+
+
+@router.post("/users/{user_id}/delete", response_class=HTMLResponse)
+async def delete_user_route(
+    user_id: uuid.UUID,
+    request: Request,
+    response: Response,
+    csrf_token: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    admin = await security.current_admin(request, response, session)
+    if admin is None:
+        return _redirect("/login")
+    if not security.validate_csrf(request, csrf_token):
+        return _redirect("/")
+    try:
+        await users_admin.delete_user(session, user_id, admin=admin)
+    except ApiError as exc:
+        return await _dashboard(request, response, session, admin, error=exc.message)
     return _redirect("/")

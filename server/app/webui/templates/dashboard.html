@@ -57,4 +57,54 @@
   <p class="hint">No invitations yet. Create one above.</p>
   {% endif %}
 </section>
+
+<section class="card">
+  <h1>Users</h1>
+  {% if users %}
+  <table class="grid">
+    <thead>
+      <tr><th>Username</th><th>Role</th><th>Status</th><th>Devices</th>
+          <th>GIFs</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.role }}</td>
+        <td>
+          {% if u.is_active %}<span class="badge active">active</span>
+          {% else %}<span class="badge revoked">disabled</span>{% endif %}
+        </td>
+        <td>{{ u.active_device_count }}/{{ u.device_count }}</td>
+        <td>{{ u.gif_count }}</td>
+        <td>{{ u.created_at.strftime("%Y-%m-%d") }}</td>
+        <td class="actions">
+          <form method="post" action="/users/{{ u.id }}/repair" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" title="Issue a code to re-pair a device for this user">Re-pair</button>
+          </form>
+          {% if u.active_device_count > 0 %}
+          <form method="post" action="/users/{{ u.id }}/revoke-devices" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" title="Sign out all this user's devices">Revoke devices</button>
+          </form>
+          {% endif %}
+          {% if u.id != admin.id %}
+          <form method="post" action="/users/{{ u.id }}/delete" class="inline"
+                data-confirm="Delete {{ u.username }} and all their GIFs? This cannot be undone.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="danger">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="hint">Re-pair issues a one-time code (shown in Invitations above) that
+    restores access to an existing account — useful after a reinstall.</p>
+  {% else %}
+  <p class="hint">No users yet.</p>
+  {% endif %}
+</section>
 {% endblock %}

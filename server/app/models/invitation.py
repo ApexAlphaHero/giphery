@@ -34,6 +34,11 @@ class Invitation(UUIDPkMixin, Base):
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     redeemed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Re-pair invite: when set, redeeming adds a device to this existing user
+    # instead of creating a new one (admin-issued account recovery).
+    target_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

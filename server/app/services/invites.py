@@ -48,8 +48,13 @@ async def create_invite(
     label: str | None,
     max_uses: int,
     expires_at: datetime | None,
+    target_user_id: uuid.UUID | None = None,
 ) -> tuple[Invitation, str]:
-    """Create an invite; returns the row and the plaintext code (shown once)."""
+    """Create an invite; returns the row and the plaintext code (shown once).
+
+    When ``target_user_id`` is set, this is a re-pair invite: redeeming it adds a
+    device to that existing user instead of creating a new account.
+    """
     # Avoid the astronomically unlikely lookup-hash collision.
     for _ in range(5):
         code = generate_code()
@@ -69,6 +74,7 @@ async def create_invite(
         created_by=admin.id,
         max_uses=max_uses,
         expires_at=expires_at,
+        target_user_id=target_user_id,
     )
     session.add(invite)
     await session.flush()
@@ -115,24 +121,32 @@ async def redeem_invite(
         audit("invite_redeem_failed", client_ip=client_ip)
         raise ApiError(400, *_GENERIC_INVITE_ERROR)
 
-    # Create the user with a random, unknowable password — regular users
-    # authenticate via device tokens, never password login.
-    random_password = secrets.token_urlsafe(32)
-    user = await create_user(
-        session,
-        username=username,
-        password=random_password,
-        role=ROLE_USER,
-        display_name=display_name,
-        enforce_strength=False,
-    )
+    if invite.target_user_id is not None:
+        # Re-pair invite: add a device to the existing user (account recovery).
+        # The submitted username is ignored; the bound user is authoritative.
+        user = await session.get(User, invite.target_user_id)
+        if user is None or not user.is_active:
+            audit("invite_redeem_failed", client_ip=client_ip)
+            raise ApiError(400, *_GENERIC_INVITE_ERROR)
+    else:
+        # Normal invite: create the user with a random, unknowable password —
+        # regular users authenticate via device tokens, never password login.
+        random_password = secrets.token_urlsafe(32)
+        user = await create_user(
+            session,
+            username=username,
+            password=random_password,
+            role=ROLE_USER,
+            display_name=display_name,
+            enforce_strength=False,
+        )
 
     invite.uses_count += 1
     invite.redeemed_by = user.id
     invite.redeemed_at = _now()
 
     tokens = await issue_tokens_for_new_device(
-        session, user, device_name=username, platform=platform
+        session, user, device_name=user.username, platform=platform
     )
     audit(
         "invite_redeemed",
