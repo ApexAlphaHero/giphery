@@ -53,6 +53,7 @@ class GalleryViewModel @Inject constructor(
     fun refresh() {
         _state.update { it.copy(refreshing = true, error = null) }
         load(reset = true)
+        loadTags() // tag chips can change after uploads/edits/deletes
     }
 
     private fun reload() {
