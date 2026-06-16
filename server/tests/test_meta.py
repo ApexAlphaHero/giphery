@@ -16,9 +16,7 @@ async def test_meta_requires_auth(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 async def test_meta_reports_version_and_admin_stats(client: AsyncClient) -> None:
-    boot = await client.post(
-        "/api/v1/setup", json={"username": "admin", "password": PASSWORD}
-    )
+    boot = await client.post("/api/v1/setup", json={"username": "admin", "password": PASSWORD})
     headers = {"Authorization": f"Bearer {boot.json()['access_token']}"}
 
     resp = await client.get("/api/v1/meta", headers=headers)
@@ -36,9 +34,7 @@ async def test_meta_reports_version_and_admin_stats(client: AsyncClient) -> None
 
 @pytest.mark.asyncio
 async def test_meta_user_scoped_hides_admin_counts(client: AsyncClient) -> None:
-    boot = await client.post(
-        "/api/v1/setup", json={"username": "admin", "password": PASSWORD}
-    )
+    boot = await client.post("/api/v1/setup", json={"username": "admin", "password": PASSWORD})
     admin_h = {"Authorization": f"Bearer {boot.json()['access_token']}"}
     inv = await client.post("/api/v1/invites", headers=admin_h, json={})
     redeem = await client.post(
