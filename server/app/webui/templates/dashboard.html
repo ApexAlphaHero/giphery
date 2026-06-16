@@ -41,18 +41,27 @@
         <td>{{ inv.redeemed_by or "—" }}</td>
         <td>{{ inv.expires_at.strftime("%Y-%m-%d %H:%M") if inv.expires_at else "—" }}</td>
         <td>{{ inv.created_at.strftime("%Y-%m-%d") }}</td>
-        <td>
+        <td class="actions">
           {% if inv.status == "active" %}
           <form method="post" action="/invites/{{ inv.id }}/revoke" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-            <button type="submit" class="danger">Revoke</button>
+            <button type="submit">Revoke</button>
           </form>
           {% endif %}
+          <form method="post" action="/invites/{{ inv.id }}/delete" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button type="submit" class="danger">Delete</button>
+          </form>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  <form method="post" action="/invites/clear-inactive" class="inline"
+        data-confirm="Delete all revoked and expired invitations?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="link">Clear revoked &amp; expired</button>
+  </form>
   {% else %}
   <p class="hint">No invitations yet. Create one above.</p>
   {% endif %}

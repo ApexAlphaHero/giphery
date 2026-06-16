@@ -36,6 +36,7 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 button.danger { background: transparent; border-color: var(--danger); color: var(--danger); }
 button.link { background: none; border: none; color: var(--accent); padding: 0; }
 .inline { display: inline; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .hint { color: var(--muted); font-size: .8rem; }
 .alert { padding: 10px 14px; border-radius: 8px; margin: 14px 0; }
 .alert.error { background: rgba(255,92,108,.12); border: 1px solid var(--danger); }

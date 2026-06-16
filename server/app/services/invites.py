@@ -100,6 +100,26 @@ async def revoke_invite(session: AsyncSession, invite_id: uuid.UUID, *, admin: U
         audit("invite_revoked", user_id=str(admin.id), invite_id=str(invite.id))
 
 
+async def delete_invite(session: AsyncSession, invite_id: uuid.UUID, *, admin: User) -> None:
+    """Permanently remove an invitation row (cleanup)."""
+    invite = await session.get(Invitation, invite_id)
+    if invite is not None:
+        await session.delete(invite)
+        audit("invite_deleted", user_id=str(admin.id), invite_id=str(invite_id))
+
+
+async def clear_inactive_invites(session: AsyncSession, *, admin: User) -> int:
+    """Delete all revoked/expired invites (keeps active + redeemed). Returns count."""
+    invites = await list_invites(session)
+    count = 0
+    for inv in invites:
+        if derive_status(inv) in ("revoked", "expired"):
+            await session.delete(inv)
+            count += 1
+    audit("invites_cleared", user_id=str(admin.id), count=count)
+    return count
+
+
 async def redeem_invite(
     session: AsyncSession,
     *,

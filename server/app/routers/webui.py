@@ -248,6 +248,38 @@ async def revoke_invite(
     return _redirect("/")
 
 
+@router.post("/invites/{invite_id}/delete", response_class=HTMLResponse)
+async def delete_invite(
+    invite_id: uuid.UUID,
+    request: Request,
+    response: Response,
+    csrf_token: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    admin = await security.current_admin(request, response, session)
+    if admin is None:
+        return _redirect("/login")
+    if security.validate_csrf(request, csrf_token):
+        with contextlib.suppress(ApiError):
+            await invite_service.delete_invite(session, invite_id, admin=admin)
+    return _redirect("/")
+
+
+@router.post("/invites/clear-inactive", response_class=HTMLResponse)
+async def clear_inactive_invites(
+    request: Request,
+    response: Response,
+    csrf_token: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    admin = await security.current_admin(request, response, session)
+    if admin is None:
+        return _redirect("/login")
+    if security.validate_csrf(request, csrf_token):
+        await invite_service.clear_inactive_invites(session, admin=admin)
+    return _redirect("/")
+
+
 # --- Users ---------------------------------------------------------------
 @router.post("/users/{user_id}/repair", response_class=HTMLResponse)
 async def repair_user(

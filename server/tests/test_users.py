@@ -88,6 +88,31 @@ async def test_cannot_delete_self_or_last_admin(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_delete_and_clear_inactive_invites(client: AsyncClient) -> None:
+    admin_h = await _admin_headers(client)
+    # Two invites: one we'll revoke, one we'll delete directly.
+    a = await client.post("/api/v1/invites", headers=admin_h, json={})
+    b = await client.post("/api/v1/invites", headers=admin_h, json={})
+    a_id = uuid.UUID(a.json()["id"])
+    b_id = uuid.UUID(b.json()["id"])
+
+    async with SessionLocal() as s:
+        admin = (await s.execute(select(User).where(User.username == "admin"))).scalar_one()
+        await invite_service.revoke_invite(s, a_id, admin=admin)  # a -> revoked
+        await invite_service.delete_invite(s, b_id, admin=admin)  # b -> gone
+        await s.commit()
+
+    async with SessionLocal() as s:
+        admin = (await s.execute(select(User).where(User.username == "admin"))).scalar_one()
+        cleared = await invite_service.clear_inactive_invites(s, admin=admin)
+        await s.commit()
+    assert cleared == 1  # the revoked one
+
+    listed = await client.get("/api/v1/invites", headers=admin_h)
+    assert listed.json() == []  # all cleaned up
+
+
+@pytest.mark.asyncio
 async def test_revoke_devices_counts(client: AsyncClient) -> None:
     admin_h = await _admin_headers(client)
     red = await _redeem_new(client, admin_h, "carol")
