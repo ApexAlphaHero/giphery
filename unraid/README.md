@@ -41,6 +41,9 @@ cp giphery-db.xml giphery-api.xml /boot/config/plugins/dockerMan/templates-user/
 Docker tab → **Add Container** → *Template* dropdown → **giphery-db**, fill in:
 - **POSTGRES_PASSWORD** — a strong password.
 - Network is preset to `giphery`. **Do not add a port.** Apply.
+- The data mount is **`/var/lib/postgresql`** (postgres:18 convention — it stores
+  data in a `18/` subdir). Point it at an **empty** host folder; a leftover
+  pre-18 `data/` directory there will make the container refuse to start.
 
 Then **Add Container** → **giphery-api**, fill in:
 - **DATABASE_URL** — replace `CHANGE_ME` with the same Postgres password:

@@ -27,7 +27,7 @@
   <Data>
     <Volume>
       <HostDir>/mnt/user/appdata/giphery/db</HostDir>
-      <ContainerDir>/var/lib/postgresql/data</ContainerDir>
+      <ContainerDir>/var/lib/postgresql</ContainerDir>
       <Mode>rw</Mode>
     </Volume>
   </Data>
@@ -48,7 +48,7 @@
       <Mode/>
     </Variable>
   </Environment>
-  <Config Name="Postgres data" Target="/var/lib/postgresql/data" Default="/mnt/user/appdata/giphery/db" Mode="rw" Description="Database files on the array." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/giphery/db</Config>
+  <Config Name="Postgres data" Target="/var/lib/postgresql" Default="/mnt/user/appdata/giphery/db" Mode="rw" Description="Database files on the array. NOTE: postgres:18 expects the mount at /var/lib/postgresql (data lands in a 18/ subdir), NOT /var/lib/postgresql/data." Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/giphery/db</Config>
   <Config Name="POSTGRES_USER" Target="POSTGRES_USER" Default="giphery" Mode="" Description="Database user." Type="Variable" Display="always" Required="true" Mask="false">giphery</Config>
   <Config Name="POSTGRES_PASSWORD" Target="POSTGRES_PASSWORD" Default="" Mode="" Description="Database password — set a strong value, must match DATABASE_URL in giphery-api." Type="Variable" Display="always" Required="true" Mask="true"></Config>
   <Config Name="POSTGRES_DB" Target="POSTGRES_DB" Default="giphery" Mode="" Description="Database name." Type="Variable" Display="always" Required="true" Mask="false">giphery</Config>
