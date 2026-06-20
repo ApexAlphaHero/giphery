@@ -36,19 +36,6 @@ yarn-error.log*
 dist-ssr/
 *.local
 
-# ──────────────────────── Android / Gradle / Kotlin ─────────────────────
-android/.gradle/
-android/build/
-android/app/build/
-android/captures/
-android/.cxx/
-android/local.properties
-android/.idea/
-*.iml
-*.keystore
-!debug.keystore
-.kotlin/
-
 # ────────────────────────────── Docker ──────────────────────────────────
 # (named volumes are managed by Docker, not committed)
 

@@ -87,7 +87,7 @@ Legend: ✅ done · 🚧 in progress · ⬜ not started (tracked by build phase)
 - ✅ Security headers at SWAG (sample conf in README) + app-level defense-in-depth (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, COOP, Permissions-Policy); HTTPS + HSTS at SWAG. *(Phase 8 — app/middleware.py, README)*
 - ✅ Structured audit logging without secrets + 24h rolling app log (hourly rotation, 24 backups, redaction filter). *(Phase 2 — app/logging_config.py, app/middleware.py)*
 - ✅ Android: HTTPS-only (no cleartext + network security config), refresh token in Keystore-backed EncryptedSharedPreferences (access token in-memory), OkHttp logging redacts Authorization, `allowBackup=false` + backup/data-extraction rules exclude the token store, transparent 401 refresh. *(Phase 7)*
-- ✅ CI runs lint (ruff incl. flake8-bandit `S` rules), type-check (mypy strict), tests, dependency vulnerability scan (`pip-audit` — clean; `gradle`/`npm` jobs); static analysis run each phase. *(Phase 1 skeleton → Phase 8)*
+- ✅ CI runs lint (ruff incl. flake8-bandit `S` rules), type-check (mypy strict), tests, dependency vulnerability scan (`pip-audit` — clean); static analysis run each phase. *(Phase 1 skeleton → Phase 8)*
 
 ## Responsible disclosure
 Report vulnerabilities privately to the repository owner (see README contact). Do not open public issues for security bugs. Expected acknowledgement within a reasonable window; fixes prioritized by severity.

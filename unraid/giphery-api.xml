@@ -13,7 +13,7 @@
   <Category>MediaApp:Photos Tools:</Category>
   <WebUI/>
   <TemplateURL/>
-  <Icon>https://raw.githubusercontent.com/ApexAlphaHero/giphery/main/android/app/src/main/res/drawable/ic_launcher_foreground.xml</Icon>
+  <Icon/>
   <ExtraParams/>
   <PostArgs/>
   <CPUset/>

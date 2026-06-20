@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Legacy backup rules (API < 31). Exclude secrets. -->
-<full-backup-content>
-    <exclude domain="sharedpref" path="giphery_secure_tokens.xml" />
-    <exclude domain="file" path="datastore/" />
-</full-backup-content>

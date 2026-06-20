@@ -1,12 +1,13 @@
 # Giphery
 
 Self-hosted GIF library: a dockerized **FastAPI + PostgreSQL** server (behind a
-SWAG reverse proxy) and an **Android management app** to upload, tag, search,
-and manage GIFs. A future keyboard/IME app (separate project) will reuse the
-GIF search + raw-serve endpoints to insert GIFs.
+SWAG reverse proxy) that pairs with an **Android management app** to upload, tag,
+search, and manage GIFs. A future keyboard/IME app will reuse the GIF search +
+raw-serve endpoints to insert GIFs.
 
-> **Scope:** this repo contains the **server** and the **Android management
-> app** only. The IME/keyboard app is out of scope.
+> **Scope:** this repo contains the **server** (API + admin web UI) only. The
+> **Android management app** lives in its own repository, and the IME/keyboard
+> app is a separate project.
 
 - **CLAUDE.md** — operating guide & commands.
 - **ARCHITECTURE.md** — data model, full REST API contract, flows, logging, decisions.
@@ -34,8 +35,8 @@ docker compose exec api alembic upgrade head
 #  - on the phone: open the Giphery app → enter server URL + code + a username → paired
 ```
 
-Status: **Phase 1 (docs & scaffolding) complete.** Backend, web UI, and Android
-app are built in subsequent phases — see CLAUDE.md / the build phases.
+Status: **Phase 1 (docs & scaffolding) complete.** Backend and web UI are built
+in subsequent phases — see CLAUDE.md / the build phases.
 
 ## Running behind SWAG
 
@@ -96,7 +97,7 @@ docker compose exec api ls -la /data/logs   # rotated files
 ## Development
 
 See **CLAUDE.md** for the full command reference (run backend locally, tests,
-lint, type-check, migrations, build the Android app).
+lint, type-check, migrations).
 
 ## Security
 

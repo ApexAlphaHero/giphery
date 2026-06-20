@@ -10,8 +10,9 @@ app** to upload, tag, search, and manage their own GIFs. A separate, future
 — but the GIF raw-serve and search endpoints are designed so that IME client
 can consume them without server changes.
 
-**Scope of this repo: the server (FastAPI + PostgreSQL, dockerized) and the
-Android management app only.** Do not build the IME/keyboard app here.
+**Scope of this repo: the server (FastAPI + PostgreSQL, dockerized) only.** The
+**Android management app lives in its own repository** — do not build it here.
+Do not build the IME/keyboard app here either.
 
 ## Tech stack (pinned major versions)
 
@@ -33,19 +34,14 @@ Android management app only.** Do not build the IME/keyboard app here.
   Decision log.
 
 ### Android management app
-- Kotlin **2.2.21** + KSP **2.2.21-2.0.5** (must be a published, matching pair),
-  Jetpack **Compose** (BOM 2026.05.01), **Material 3** (BOM-managed)
-- AGP **8.13.2**, Gradle **8.13**, `compileSdk`/`targetSdk` **36**, `minSdk` **26**
-- Retrofit + OkHttp + kotlinx.serialization; **Coil** for animated GIFs
-- Coroutines + Flow; **Hilt** DI; **DataStore** + Keystore-encrypted token storage
-- MVVM + repository pattern, single-activity, Compose Navigation
+- Maintained in a **separate repository** — out of scope for this repo. It pairs
+  with this server via the invite-redeem and `/api/v1` endpoints.
 
 ### Tooling / quality
 - Backend: **ruff** (lint+format), **mypy** (strict), **pytest** + `pytest-asyncio`, `httpx`, coverage, `pip-audit`
-- Android: **ktlint/detekt**, JUnit + **Turbine**, Compose UI tests
 - **pre-commit** hooks, **GitHub Actions** CI (lint, type-check, tests, dep vuln scan)
 
-## Monorepo layout
+## Repo layout
 
 ```
 giphery/
@@ -53,32 +49,29 @@ giphery/
 ├─ docker-compose.yml          # api + postgres (+ optional redis)
 ├─ .env.example                # documented config; no real secrets
 ├─ .github/workflows/ci.yml    # lint, type-check, test, dep scan
-├─ server/
-│  ├─ Dockerfile               # multi-stage, non-root, slim
-│  ├─ pyproject.toml           # pinned deps; ruff/mypy/pytest config
-│  ├─ alembic/                 # migrations
-│  ├─ app/
-│  │  ├─ main.py               # app, middleware, routers
-│  │  ├─ config.py             # pydantic-settings
-│  │  ├─ db.py                 # async engine/session
-│  │  ├─ models/               # SQLAlchemy models
-│  │  ├─ schemas/              # Pydantic v2 schemas
-│  │  ├─ auth/                 # hashing, JWT, deps, RBAC
-│  │  ├─ routers/              # auth, users, invites, gifs, tags, health
-│  │  ├─ services/             # business logic
-│  │  ├─ storage/              # filesystem GIF storage
-│  │  └─ webui/                # Jinja2 templates + static
-│  └─ tests/
-└─ android/
-   ├─ settings.gradle.kts
-   ├─ build.gradle.kts
-   ├─ gradle/libs.versions.toml
-   └─ app/src/main/java/.../giphery/{data,domain,ui,di}/
+└─ server/
+   ├─ Dockerfile               # multi-stage, non-root, slim
+   ├─ pyproject.toml           # pinned deps; ruff/mypy/pytest config
+   ├─ alembic/                 # migrations
+   ├─ app/
+   │  ├─ main.py               # app, middleware, routers
+   │  ├─ config.py             # pydantic-settings
+   │  ├─ db.py                 # async engine/session
+   │  ├─ models/               # SQLAlchemy models
+   │  ├─ schemas/              # Pydantic v2 schemas
+   │  ├─ auth/                 # hashing, JWT, deps, RBAC
+   │  ├─ routers/              # auth, users, invites, gifs, tags, health
+   │  ├─ services/             # business logic
+   │  ├─ storage/              # filesystem GIF storage
+   │  └─ webui/                # Jinja2 templates + static
+   └─ tests/
 ```
+
+> The Android management app is maintained in a separate repository.
 
 ## Commands
 
-> Backend commands run from `server/`. Android from `android/`.
+> Backend commands run from `server/`.
 
 | Task | Command |
 |------|---------|
@@ -92,14 +85,11 @@ giphery/
 | Backend lint+format | `cd server && ruff check . && ruff format .` |
 | Backend type-check | `cd server && mypy app` |
 | Dependency vuln scan | `cd server && pip-audit` |
-| Build Android (debug) | `cd android && ./gradlew assembleDebug` |
-| Android tests | `cd android && ./gradlew testDebugUnitTest` |
-| Android lint | `cd android && ./gradlew ktlintCheck detekt` |
 
 ## Coding conventions
-- **Formatters/linters:** ruff (line length 100) for Python; ktlint/detekt for Kotlin. CI fails on lint errors.
+- **Formatters/linters:** ruff (line length 100) for Python. CI fails on lint errors.
 - **Types:** mypy strict on `app/`. No untyped public functions.
-- **Naming:** snake_case (Python), camelCase/PascalCase (Kotlin), kebab-case routes, plural resource nouns (`/gifs`, `/invites`).
+- **Naming:** snake_case (Python), kebab-case routes, plural resource nouns (`/gifs`, `/invites`).
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`). One logical change per commit.
 - **API:** versioned `/api/v1`; consistent error envelope `{ "error": { "code", "message", "details" } }`.
 
@@ -114,7 +104,7 @@ giphery/
 
 **Don't**
 - Don't log secrets, tokens, password hashes, or raw passwords.
-- Don't disable TLS verification or enable cleartext traffic (Android).
+- Don't disable TLS verification or serve the API over cleartext in production.
 - Don't return password hashes or raw tokens in any response.
 - Don't enable `/docs` in production (`ENABLE_DOCS=false`).
 - Don't add a dependency without confirming it's maintained and pinning it.
